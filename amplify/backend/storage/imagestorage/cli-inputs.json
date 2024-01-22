@@ -1,7 +1,7 @@
 {
   "resourceName": "imagestorage",
-  "policyUUID": "e562bda2",
-  "bucketName": "awsamplify-bucket",
+  "policyUUID": "fe5446e6",
+  "bucketName": "amplifytutorial-bucket",
   "storageAccess": "auth",
   "guestAccess": [],
   "authAccess": [

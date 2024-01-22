@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import "@aws-amplify/ui-react/styles.css";
-import { API,Storage } from 'aws-amplify';
+import { Amplify } from "aws-amplify";
+import { Storage } from 'aws-amplify';
 import {
   Button,
   Flex,
@@ -11,7 +12,7 @@ import {
   TextField,
   View,
   withAuthenticator,
-} from "@aws-amplify/ui-react";
+} from '@aws-amplify/ui-react';
 import { listNotes } from "./graphql/queries";
 import {
   createNote as createNoteMutation,
@@ -26,7 +27,7 @@ const App = ({ signOut }) => {
   }, []);
 
   async function fetchNotes() {
-    const apiData = await API.graphql({ query: listNotes });
+    const apiData = await Amplify.graphql({ query: listNotes });
     const notesFromAPI = apiData.data.listNotes.items;
     await Promise.all(
       notesFromAPI.map(async (note) => {
@@ -39,33 +40,35 @@ const App = ({ signOut }) => {
     );
     setNotes(notesFromAPI);
   }
-  async function createNote(event) {
-    event.preventDefault();
-    const form = new FormData(event.target);
-    const image = form.get("image");
-    const data = {
-      name: form.get("name"),
-      description: form.get("description"),
-      image: image.name,
-    };
-    if (!!data.image) await Storage.put(data.name, image);
-    await API.graphql({
-      query: createNoteMutation,
-      variables: { input: data },
-    });
-    fetchNotes();
-    event.target.reset();
-  }
 
-  async function deleteNote({ id, name }) {
-    const newNotes = notes.filter((note) => note.id !== id);
-    setNotes(newNotes);
-    await Storage.remove(name);
-    await API.graphql({
-      query: deleteNoteMutation,
-      variables: { input: { id } },
-    });
-  }
+  async function createNote(event) {
+  event.preventDefault();
+  const form = new FormData(event.target);
+  const image = form.get("image");
+  const data = {
+    name: form.get("name"),
+    description: form.get("description"),
+    image: image.name,
+  };
+  if (!!data.image) await Storage.put(data.name, image);
+  await Amplify.graphql({
+    query: createNoteMutation,
+    variables: { input: data },
+  });
+  fetchNotes();
+  event.target.reset();
+}
+
+
+async function deleteNote({ id, name }) {
+  const newNotes = notes.filter((note) => note.id !== id);
+  setNotes(newNotes);
+  await Storage.remove(name);
+  await Amplify.graphql({
+    query: deleteNoteMutation,
+    variables: { input: { id } },
+  });
+}
 
   return (
     <View className="App">
